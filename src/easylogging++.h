@@ -343,6 +343,7 @@ ELPP_INTERNAL_DEBUGGING_OUT_INFO << ELPP_INTERNAL_DEBUGGING_MSG(internalInfoStre
 #if (!(ELPP_CXX0X || ELPP_CXX11))
 #   error "C++0x (or higher) support not detected! (Is `-std=c++11' missing?)"
 #endif  // (!(ELPP_CXX0X || ELPP_CXX11))
+
 // Headers
 #if defined(ELPP_SYSLOG)
 #   include <syslog.h>
@@ -499,6 +500,7 @@ class DefaultPerformanceTrackingCallback;
 namespace el {
 /// @brief Namespace containing base/internal functionality used by Easylogging++
 namespace base {
+
 /// @brief Data types used by Easylogging++
 namespace type {
 #undef ELPP_LITERAL
@@ -545,6 +547,7 @@ typedef std::shared_ptr<PerformanceTrackingCallback> PerformanceTrackingCallback
 typedef std::shared_ptr<LoggerRegistrationCallback> LoggerRegistrationCallbackPtr;
 typedef std::unique_ptr<el::base::PerformanceTracker> PerformanceTrackerPtr;
 }  // namespace type
+
 /// @brief Internal helper class that prevent copy constructor for class
 ///
 /// @detail When using this class simply inherit it privately
@@ -555,6 +558,7 @@ class NoCopy {
   NoCopy(const NoCopy&);
   NoCopy& operator=(const NoCopy&);
 };
+
 /// @brief Internal helper class that makes all default constructors private.
 ///
 /// @detail This prevents initializing class making it static unless an explicit constructor is declared.
@@ -565,7 +569,9 @@ class StaticClass {
   StaticClass(const StaticClass&);
   StaticClass& operator=(const StaticClass&);
 };
+
 }  // namespace base
+
 /// @brief Represents enumeration for severity level used to determine level of logging
 ///
 /// @detail With Easylogging++, developers may disable or enable any level regardless of
@@ -591,6 +597,7 @@ enum class Level : base::type::EnumType {
   Unknown = 1010
 };
 } // namespace el
+
 namespace std {
 template<> struct hash<el::Level> {
  public:
@@ -599,35 +606,44 @@ template<> struct hash<el::Level> {
   }
 };
 }
+
 namespace el {
+
 /// @brief Static class that contains helper functions for el::Level
 class LevelHelper : base::StaticClass {
  public:
   /// @brief Represents minimum valid level. Useful when iterating through enum.
   static const base::type::EnumType kMinValid = static_cast<base::type::EnumType>(Level::Trace);
+
   /// @brief Represents maximum valid level. This is used internally and you should not need it.
   static const base::type::EnumType kMaxValid = static_cast<base::type::EnumType>(Level::Info);
+
   /// @brief Casts level to int, useful for iterating through enum.
   static base::type::EnumType castToInt(Level level) {
     return static_cast<base::type::EnumType>(level);
   }
+
   /// @brief Casts int(ushort) to level, useful for iterating through enum.
   static Level castFromInt(base::type::EnumType l) {
     return static_cast<Level>(l);
   }
+
   /// @brief Converts level to associated const char*
   /// @return Upper case string based level.
   static const char* convertToString(Level level);
+
   /// @brief Converts from levelStr to Level
   /// @param levelStr Upper case string based level.
   ///        Lower case is also valid but providing upper case is recommended.
   static Level convertFromString(const char* levelStr);
+
   /// @brief Applies specified function to each level starting from startIndex
   /// @param startIndex initial value to start the iteration from. This is passed as pointer and
   ///        is left-shifted so this can be used inside function (fn) to represent current level.
   /// @param fn function to apply with each level. This bool represent whether or not to stop iterating through levels.
   static void forEachLevel(base::type::EnumType* startIndex, const std::function<bool(void)>& fn);
 };
+
 /// @brief Represents enumeration of ConfigurationType used to configure or access certain aspect
 /// of logging
 enum class ConfigurationType : base::type::EnumType {
@@ -661,6 +677,7 @@ enum class ConfigurationType : base::type::EnumType {
   /// @brief Represents unknown configuration
   Unknown = 1010
 };
+
 /// @brief Static class that contains helper functions for el::ConfigurationType
 class ConfigurationTypeHelper : base::StaticClass {
  public:
@@ -690,6 +707,7 @@ class ConfigurationTypeHelper : base::StaticClass {
   ///        This bool represent whether or not to stop iterating through configurations.
   static inline void forEachConfigType(base::type::EnumType* startIndex, const std::function<bool(void)>& fn);
 };
+
 /// @brief Flags used while writing logs. This flags are set by user
 enum class LoggingFlag : base::type::EnumType {
   /// @brief Makes sure we have new line for each container log entry
@@ -726,6 +744,7 @@ enum class LoggingFlag : base::type::EnumType {
   // @brief Ignore SIGINT or crash
   IgnoreSigInt = 32768,
 };
+
 namespace base {
 /// @brief Namespace containing constants used internally.
 namespace consts {
@@ -802,9 +821,11 @@ const struct {
     "Interruption generated (generally) by user or operating system."
   },
 };
+
 static const int kCrashSignalsCount                          =      sizeof(kCrashSignals) / sizeof(kCrashSignals[0]);
 }  // namespace consts
 }  // namespace base
+
 typedef std::function<void(const char*, std::size_t)> PreRollOutCallback;
 namespace base {
 static inline void defaultPreRollOutCallback(const char*, std::size_t) {}
@@ -812,6 +833,7 @@ static inline void defaultPreRollOutCallback(const char*, std::size_t) {}
 enum class TimestampUnit : base::type::EnumType {
   Microsecond = 0, Millisecond = 1, Second = 2, Minute = 3, Hour = 4, Day = 5
 };
+
 /// @brief Format flags used to determine specifiers that are active for performance improvements.
 enum class FormatFlags : base::type::EnumType {
   DateTime = 1 << 1,
@@ -830,6 +852,7 @@ enum class FormatFlags : base::type::EnumType {
   FileBase = 1 << 14,
   LevelShort = 1 << 15
 };
+
 /// @brief A subsecond precision class containing actual width and offset of the subsecond part
 class SubsecondPrecision {
  public:
@@ -847,6 +870,7 @@ class SubsecondPrecision {
  private:
   void init(int width);
 };
+
 /// @brief Type alias of SubsecondPrecision
 typedef SubsecondPrecision MillisecondsWidth;
 /// @brief Namespace containing utility functions/static classes used internally
@@ -861,6 +885,7 @@ safeDelete(T*& pointer) {
   delete pointer;
   pointer = nullptr;
 }
+
 /// @brief Bitwise operations for C++11 strong enum class. This casts e into Flag_T and returns value after bitwise operation
 /// Use these function as <pre>flag = bitwise::Or<MyEnum>(MyEnum::val1, flag);</pre>
 namespace bitwise {
@@ -877,6 +902,7 @@ static inline base::type::EnumType Or(Enum e, base::type::EnumType flag) {
   return static_cast<base::type::EnumType>(flag) | static_cast<base::type::EnumType>(e);
 }
 }  // namespace bitwise
+
 template <typename Enum>
 static inline void addFlag(Enum e, base::type::EnumType* flag) {
   *flag = base::utils::bitwise::Or<Enum>(e, *flag);
@@ -983,6 +1009,7 @@ class NoMutex : base::NoCopy {
   }
   inline void unlock(void) {}
 };
+
 /// @brief Lock guard wrapper used when multi-threading is disabled.
 template <typename Mutex>
 class NoScopedLock : base::NoCopy {
@@ -995,6 +1022,7 @@ class NoScopedLock : base::NoCopy {
   NoScopedLock(void);
 };
 }  // namespace internal
+
 typedef base::threading::internal::NoMutex Mutex;
 typedef base::threading::internal::NoScopedLock<base::threading::Mutex> ScopedLock;
 #endif  // ELPP_THREADING_ENABLED
@@ -1035,6 +1063,7 @@ static inline std::string getCurrentThreadId(void) {
 }
 #endif  // ELPP_THREADING_ENABLED
 }  // namespace threading
+
 namespace utils {
 class File : base::StaticClass {
  public:
@@ -1062,6 +1091,7 @@ class File : base::StaticClass {
                                 std::size_t limit = base::consts::kSourceFilenameMaxLength,
                                 const char* separator = base::consts::kFilePathSeparator);
 };
+
 /// @brief String utilities helper class used internally. You should not use it.
 class Str : base::StaticClass {
  public:
@@ -1133,6 +1163,7 @@ class Str : base::StaticClass {
   ///        NOTE: Need to free return value after use!
   static char* wcharPtrToCharPtr(const wchar_t* line);
 };
+
 /// @brief Operating System helper static class used internally. You should not use it.
 class OS : base::StaticClass {
  public:
@@ -1175,6 +1206,7 @@ class OS : base::StaticClass {
   /// @brief Whether or not terminal supports colors
   static bool termSupportsColor(void);
 };
+
 /// @brief Contains utilities for cross-platform date/time. This class make use of el::base::utils::Str
 class DateTime : base::StaticClass {
  public:
@@ -1207,6 +1239,7 @@ class DateTime : base::StaticClass {
   static char* parseFormat(char* buf, std::size_t bufSz, const char* format, const struct tm* tInfo,
                            std::size_t msec, const base::SubsecondPrecision* ssPrec);
 };
+
 /// @brief Command line arguments for application if specified using el::Helpers::setArgs(..) or START_EASYLOGGINGPP(..)
 class CommandLineArgs {
  public:
@@ -1245,6 +1278,7 @@ class CommandLineArgs {
   std::unordered_map<std::string, std::string> m_paramsWithValue;
   std::vector<std::string> m_params;
 };
+
 /// @brief Abstract registry (aka repository) that provides basic interface for pointer repository specified by T_Ptr type.
 ///
 /// @detail Most of the functions are virtual final methods but anything implementing this abstract class should implement
@@ -2029,6 +2063,7 @@ class TypedConfigurations : public base::threading::ThreadSafe {
     return unsafeValidateFileRolling(level, preRollOutCallback);
   }
 };
+
 /// @brief Class that keeps record of current line hit for occasional logging
 class HitCounter {
  public:
@@ -2140,6 +2175,7 @@ enum class DispatchAction : base::type::EnumType {
   None = 1, NormalLog = 2, SysLog = 4
 };
 }  // namespace base
+
 template <typename T>
 class Callback : protected base::threading::ThreadSafe {
  public:
@@ -2207,6 +2243,7 @@ class LogBuilder : base::NoCopy {
   friend class el::base::DefaultLogDispatchCallback;
 };
 typedef std::shared_ptr<LogBuilder> LogBuilderPtr;
+
 /// @brief Represents a logger holding ID and configurations we need to write logs
 ///
 /// @detail This class does not write logs itself instead its used by writer to read configurations from.
@@ -2451,6 +2488,7 @@ class VRegistry : base::NoCopy, public base::threading::ThreadSafe {
   std::unordered_map<std::string, base::type::VerboseLevel> m_modules;
 };
 }  // namespace base
+
 class LogMessage {
  public:
   LogMessage(Level level, const std::string& file, base::type::LineNumber line, const std::string& func,
